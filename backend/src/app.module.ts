@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountModule } from './account/account.module';
+import { Account } from './account/entities/account.entity';
 
 @Module({
   imports: [
@@ -11,7 +12,8 @@ import { AccountModule } from './account/account.module';
       username: process.env.DB_USERNAME ?? 'root',
       password: process.env.DB_PASSWORD ?? 'namcan1234az',
       database: process.env.DB_DATABASE ?? 'Gacha_Acc_Shop',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      entities: [Account],
+      autoLoadEntities: true,
       synchronize: true,
     }),
     AccountModule,

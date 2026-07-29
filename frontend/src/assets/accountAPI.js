@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Mặc định NestJS chạy ở port 3000. Cần đảm bảo file account.controller.ts đang map với route 'account' hoặc 'accounts'
-const API_URL = 'http://localhost:3000/accounts'; 
+const API_URL = 'http://localhost:3000/account'; 
 
 export const accountApi = {
   // Lấy danh sách tài khoản

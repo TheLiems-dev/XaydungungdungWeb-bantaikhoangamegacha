@@ -1,26 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { accountApi } from './api/accountApi';
+import { useState, useEffect } from 'react';
+import { accountApi } from './assets/accountAPI';
 
 function App() {
   const [activeTab, setActiveTab] = useState('all');
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   // Gọi API lấy dữ liệu từ Backend khi trang vừa load xong
   useEffect(() => {
-    fetchAccounts();
-  }, []);
+    let isMounted = true;
 
-  const fetchAccounts = async () => {
-    try {
-      const data = await accountApi.getAll();
-      setAccounts(data);
-    } catch (error) {
-      console.error("Lỗi khi kết nối với Backend NestJS:", error);
-    } finally {
-      setLoading(false);
+    async function loadAccounts() {
+      try {
+        const data = await accountApi.getAll();
+        if (isMounted) {
+          setError('');
+          setAccounts(data);
+        }
+      } catch (error) {
+        console.error("Lỗi khi kết nối với Backend NestJS:", error);
+        if (isMounted) {
+          setError('Không tải được dữ liệu từ backend. Kiểm tra server NestJS, CORS và API path.');
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
     }
-  };
+
+    void loadAccounts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100 font-sans w-full">
@@ -102,6 +117,8 @@ function App() {
             {/* HIỂN THỊ TRẠNG THÁI LOADING / GRID DATA */}
             {loading ? (
               <div className="text-center text-gray-500 mt-10">⏳ Đang tải dữ liệu từ Backend...</div>
+            ) : error ? (
+              <div className="text-center text-red-400 mt-10">{error}</div>
             ) : accounts.length === 0 ? (
               <div className="text-center text-gray-500 mt-10">Chưa có tài khoản nào trong cơ sở dữ liệu. Hãy thêm mới!</div>
             ) : (
@@ -122,10 +139,12 @@ function App() {
                       </div>
                     </div>
                     
-                    {/* Giả định model Account có trường title hoặc name theo account.entity.ts */}
                     <h3 className="font-semibold text-gray-100 text-lg mb-2 line-clamp-2 leading-snug group-hover:text-purple-300">
-                      {acc.title || acc.name || 'Tài khoản Gacha VIP'} 
+                      {acc.username || acc.title || acc.name || 'Tài khoản Gacha VIP'}
                     </h3>
+                    <p className="text-sm text-gray-400">
+                      Server: {acc.game_server || 'N/A'} · Level: {acc.level ?? 'N/A'}
+                    </p>
                     
                     <div className="flex justify-between items-end mt-6 pt-4 border-t border-gray-700/50">
                       <div>
