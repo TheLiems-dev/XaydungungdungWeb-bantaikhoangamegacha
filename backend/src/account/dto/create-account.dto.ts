@@ -1,4 +1,5 @@
-import { IsString, IsNumber, IsOptional, Min } from 'class-validator';
+import { IsIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { AccountStatus } from '../entities/account.entity';
 
 export class CreateAccountDto {
   @IsString()
@@ -6,6 +7,10 @@ export class CreateAccountDto {
 
   @IsString()
   game_server!: string;
+
+  @IsOptional()
+  @IsString()
+  game_type?: string;
 
   @IsOptional()
   @IsNumber()
@@ -17,6 +22,6 @@ export class CreateAccountDto {
   price!: number;
 
   @IsOptional()
-  @IsString()
-  status?: string;
+  @IsIn([AccountStatus.AVAILABLE, AccountStatus.SOLD])
+  status?: AccountStatus;
 }

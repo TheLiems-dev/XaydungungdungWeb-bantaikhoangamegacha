@@ -3,6 +3,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
 import { Account } from './entities/account.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { JwtService } from '@nestjs/jwt';
+import { Reflector } from '@nestjs/core';
 
 describe('AccountController', () => {
   let controller: AccountController;
@@ -23,6 +27,10 @@ describe('AccountController', () => {
             delete: jest.fn(),
           },
         },
+        { provide: JwtAuthGuard, useValue: { canActivate: jest.fn(() => true) } },
+        { provide: RolesGuard, useValue: { canActivate: jest.fn(() => true) } },
+        { provide: JwtService, useValue: { verifyAsync: jest.fn() } },
+        { provide: Reflector, useValue: { getAllAndOverride: jest.fn() } },
       ],
     }).compile();
 
